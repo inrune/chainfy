@@ -1,0 +1,12 @@
+{
+  "name": "chainfy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Chainfy — Solana devnet payment platform for digital products",
+  "scripts": {
+    "install:all": "npm install --prefix server && npm install --prefix web",
+    "server": "npm start --prefix server",
+    "web": "npm run dev --prefix web",
+    "seed": "npm run seed --prefix server"
+  }
+}
